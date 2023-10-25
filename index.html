@@ -32,7 +32,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = "1939318107";
+    var serviceWorkerVersion = "4014990825";
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer=""></script>
@@ -52,7 +52,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #ffffff; /* Change the background color to your preference */
+      background-color: #f0e1d8; /* Change the background color to your preference */
     }
 
     #loading-screen img {
@@ -71,18 +71,57 @@
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 </head>
 
-<body>
-  <div id="loading-screen">
+<body style="background-color: #f0e1d8;">
+  <!-- <div id="loading-screen">
     <div class="circle">
       <img src="logo.png" alt="Logo" width="200" height="200">
     </div>
     <p>Loading...</p>
     <p></p>
     <p>Too slow? Visit our alternative website instead <a href="https://pips-official.web.app">here.</a></p>
+  </div> -->
+
+  <div id="loading-screen">
+    <canvas id="canvas" width="500" height="500"></canvas>
   </div>
+  
+  <script src="https://unpkg.com/@rive-app/canvas@2.1.0"></script>
 
   <script>
-    var loading = document.getElementById('loading');
+    let loadingProgress = 0;
+
+    const canvasEl = document.querySelector("canvas");
+
+    var stateMachineInput;
+    var interval
+
+    const r = new rive.Rive({
+        src: "/miner-loading-bar.riv",
+        // Or the path to a public Rive asset
+        // src: '/public/example.riv',
+        canvas: canvasEl,
+        autoplay: true,
+        stateMachines: "State Machine 1",
+        onLoad: () => {
+          r.resizeDrawingSurfaceToCanvas();
+
+          stateMachineInput = r.stateMachineInputs("State Machine 1")[0];
+
+          interval =  setInterval(_increment, 100);
+        },
+    });
+    
+    function _increment() {
+      var value = stateMachineInput.value;
+      if (value <= 100) {
+        stateMachineInput.value = value + 1;
+        if (!r.isPlaying) {
+          r.play();
+        }
+      } else {
+        clearInterval(interval);
+      }
+    }
 
     window.addEventListener('load', function (ev) {
       // Download main.dart.js
@@ -92,6 +131,10 @@
         },
         onEntrypointLoaded: function (engineInitializer) {
           engineInitializer.initializeEngine().then(function (appRunner) {
+            clearInterval(interval);
+            
+            r.cleanup();
+
             appRunner.runApp();
           });
         }
@@ -114,11 +157,17 @@
   
   <script>
     if ("serviceWorker" in navigator) {
-        window.addEventListener("load", function () {
-          navigator.serviceWorker.register("/firebase-messaging-sw.js")
-            .then((registration) => console.log('Registration is successful, scope is: ', registration.scope));
-        });
-      }
-      </script>
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/firebase-messaging-sw.js")
+          .then((registration) => console.log('Registration is successful, scope is: ', registration.scope));
+      });
+    }
+  </script>
+
+  
+
+  <script>
+    
+  </script>
 
 </body></html>
